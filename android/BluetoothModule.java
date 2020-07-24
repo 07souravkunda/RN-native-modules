@@ -23,6 +23,7 @@ import com.facebook.react.bridge.Arguments;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
+import java.util.Set;
 
 public class BluetoothModule extends ReactContextBaseJavaModule implements ActivityEventListener {
     private static ReactApplicationContext reactContext;
@@ -32,6 +33,7 @@ public class BluetoothModule extends ReactContextBaseJavaModule implements Activ
     private BroadcastReceiver mBluetoothDiscoveryReceiver;
     private BluetoothAdapter mBluetoothAdapter;
     private Map<String, String> unpairedDevices;
+    private Set<BluetoothDevice> pairedDevices;
     Promise promise = null;
     Promise discoverPromise = null;
 
@@ -84,6 +86,28 @@ public class BluetoothModule extends ReactContextBaseJavaModule implements Activ
     @ReactMethod
     public void get(int val, Promise p) {
         p.resolve(2);
+    }
+
+    @ReactMethod
+    public void getPairedDevices(Promise prom) {
+        pairedDevices = mBluetoothAdapter.getBondedDevices();
+        WritableArray deviceArray = Arguments.createArray();
+        for (BluetoothDevice device : pairedDevices) {
+            String deviceName = device.getName();
+            String deviceHardwareAddress = device.getAddress(); // MAC address
+            WritableMap map = Arguments.createMap();
+            map.putString("name", deviceName);
+            map.putString("address", deviceHardwareAddress);
+            deviceArray.pushMap(map);
+        }
+        prom.resolve(deviceArray);
+    }
+
+    @ReactMethod
+    public void turnOff(Promise prom) {
+        mBluetoothAdapter.disable();
+        prom.resolve(true);
+        Toast.makeText(getReactApplicationContext(), "turned off bluetooth", Toast.LENGTH_SHORT).show();
     }
 
     @ReactMethod
