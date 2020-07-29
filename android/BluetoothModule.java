@@ -41,12 +41,13 @@ public class BluetoothModule extends ReactContextBaseJavaModule implements Activ
         super(context);
         reactContext = context;
         this.ReactContext = context;
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         reactContext.addActivityEventListener(this);
     }
 
     @Override
     public String getName() {
-        return "Toast";
+        return "Bluetooth";
     }
 
     @Override
@@ -84,11 +85,6 @@ public class BluetoothModule extends ReactContextBaseJavaModule implements Activ
     }
 
     @ReactMethod
-    public void get(int val, Promise p) {
-        p.resolve(2);
-    }
-
-    @ReactMethod
     public void getPairedDevices(Promise prom) {
         pairedDevices = mBluetoothAdapter.getBondedDevices();
         WritableArray deviceArray = Arguments.createArray();
@@ -101,6 +97,11 @@ public class BluetoothModule extends ReactContextBaseJavaModule implements Activ
             deviceArray.pushMap(map);
         }
         prom.resolve(deviceArray);
+    }
+
+    @ReactMethod
+    public void isEnabled(Promis prom) {
+        prom.resolve(mBluetoothAdapter.isEnabled());
     }
 
     @ReactMethod
@@ -146,8 +147,7 @@ public class BluetoothModule extends ReactContextBaseJavaModule implements Activ
     }
 
     @ReactMethod
-    public void bluetoothCheck(Promise p) {
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    public void requsetEnable(Promise p) {
         mBluetoothAdapter = bluetoothAdapter;
         if (bluetoothAdapter == null) {
             Toast.makeText(getReactApplicationContext(), "bluetooth no suported", Toast.LENGTH_SHORT).show();
