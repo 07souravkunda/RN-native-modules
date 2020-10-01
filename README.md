@@ -1,1 +1,1 @@
-# react-native-bluetooth-comp
+# RN-native-modules
